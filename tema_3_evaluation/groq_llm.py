@@ -1,11 +1,15 @@
 from deepeval.models.base_model import DeepEvalBaseLLM
 from groq import Groq
-
+import os
 
 class GroqDeepEval(DeepEvalBaseLLM):
     def __init__(self, model: str = "llama-3.3-70b-versatile"):
         self.model = model
-        self.client = Groq()
+        self.client = Groq(
+            api_key=os.getenv("GROQ_API_KEY"),
+            base_url=os.getenv("GROQ_DEEPEVAL_BASE_URL", "https://api.groq.com")
+        )
+
 
     def load_model(self):
         return self.client
