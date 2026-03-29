@@ -14,37 +14,45 @@ BASE_URL = "http://127.0.0.1:8000"
 THRESHOLD = 0.8
 
 test_cases = [
-    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
     LLMTestCase(
-        input=""
+        input="Cum raspund unui client care cere discount pentru beton C25/30?"
     ),
-    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
     LLMTestCase(
-        input=""
+        input="Ce strategie de vanzare recomanzi pentru un antreprenor general care are nevoie de beton vara?"
     ),
-    # ToDo: Adăugați un scenariu care să fie evaluat de LLM as a Judge
     LLMTestCase(
-        input=""
+        input="Ce este o pisica?"
     ),
 ]
 
 groq_model = GroqDeepEval()
 
 evaluator1 = GEval(
-    # ToDo: Adăugați numele metricii și criteriul de evaluare.
-    name="",
-    criteria="""    
+    name="RelevantaDomeniuBetoane",
+    criteria="""
+    Evalueaza daca raspunsul este relevant pentru domeniul vanzarii de betoane.
+    Un scor mare inseamna ca raspunsul:
+    - ramane in domeniul vanzarii de betoane;
+    - foloseste context comercial relevant;
+    - nu deviaza spre subiecte fara legatura;
+    - refuza corect intrebarile din afara domeniului.
     """,
-    evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
+    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT],
     model=groq_model,
 )
 
 evaluator2 = GEval(
-    # ToDo: Adăugați numele metricii și criteriul de evaluare.
-    name="",
-    criteria="""    
+    name="CalitateRecomandareComerciala",
+    criteria="""
+    Evalueaza calitatea raspunsului din perspectiva unui asistent pentru vanzarea de betoane.
+    Un scor mare inseamna ca raspunsul:
+    - este clar si bine structurat;
+    - ofera recomandari utile comercial;
+    - explica impactul contextului (pret, sezon, client, obiectii);
+    - nu inventeaza informatii nesustinute;
+    - pentru intrebari din afara domeniului, refuza politicos si corect.
     """,
-    evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
+    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT],
     model=groq_model,
 )
 
@@ -68,24 +76,28 @@ async def _run_evaluation() -> tuple[list[dict], list[float], list[float]]:
     async with httpx.AsyncClient(timeout=90.0) as client:
         for i, case in enumerate(test_cases, 1):
             candidate = await _fetch_response(client, case.input)
-            case.actual_output = candidate
+
+            actual_text = candidate.get("response", str(candidate)) if isinstance(candidate, dict) else str(candidate)
+            case.actual_output = actual_text
 
             evaluator1.measure(case)
             evaluator2.measure(case)
 
             print(f"[{i}/{len(test_cases)}] {case.input[:60]}...")
-            # ToDo: Personalizați afișarea scorurilor pentru fiecare metrică.
-            print(f"  #ToDo: {evaluator1.score:.2f} | #ToDo: {evaluator2.score:.2f}")
+            print(
+                f"  Relevanta domeniu betoane: {evaluator1.score:.2f} | "
+                f"Calitate recomandare comerciala: {evaluator2.score:.2f}"
+            )
 
             results.append({
                 "input": case.input,
-                "response": candidate.get("response", str(candidate)) if isinstance(candidate, dict) else str(candidate),
-                # ToDo: Adăugați în dicționar scorurile și motivele pentru fiecare metrică.
-                "#ToDo_score": evaluator1.score,
-                "#ToDo_reason": evaluator1.reason,
-                "#ToDo_score": evaluator2.score,
-                "#ToDo_reason": evaluator2.reason,
+                "response": actual_text,
+                "relevanta_score": evaluator1.score,
+                "relevanta_reason": evaluator1.reason,
+                "bias_score": evaluator2.score,
+                "bias_reason": evaluator2.reason,
             })
+
             scores1.append(evaluator1.score)
             scores2.append(evaluator2.score)
 
