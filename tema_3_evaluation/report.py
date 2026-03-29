@@ -34,7 +34,7 @@ def _card_html(i: int, r: dict) -> str:
         </div>
         <div class="scores-row">
             <div class="score-box" style="border-color:{c1}">
-                <div class="score-label">Relevanță Fitness</div>
+                <div class="score-label">Relevanță Betoane</div>
                 <div class="score-value" style="color:{c1}">{r["relevanta_score"]:.2f}</div>
                 <div class="score-bar-bg">
                     <div class="score-bar-fill" style="width:{r['relevanta_score']*100:.0f}%;background:{c1}"></div>
@@ -43,7 +43,7 @@ def _card_html(i: int, r: dict) -> str:
                 <p class="score-reason">{_html.escape(r["relevanta_reason"] or "")}</p>
             </div>
             <div class="score-box" style="border-color:{c2}">
-                <div class="score-label">Bias Fitness</div>
+                <div class="score-label">Bias Betoane</div>
                 <div class="score-value" style="color:{c2}">{r["bias_score"]:.2f}</div>
                 <div class="score-bar-bg">
                     <div class="score-bar-fill" style="width:{r['bias_score']*100:.0f}%;background:{c2}"></div>
@@ -71,7 +71,7 @@ def save_report(results: list[dict], scores1: list[float], scores2: list[float],
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raport Evaluare — Instructor Fitness</title>
+    <title>Raport Evaluare — Agent Vanzari Betoane</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -188,13 +188,13 @@ def save_report(results: list[dict], scores1: list[float], scores2: list[float],
 <body>
 <div class="container">
     <div class="report-header">
-        <h1>Raport Evaluare — Instructor Fitness</h1>
+        <h1>Raport Evaluare — Agent Vanzari Betoane</h1>
         <p class="subtitle">Generat la {run_time} &nbsp;·&nbsp; {len(results)} cazuri de test &nbsp;·&nbsp; Prag: {threshold}</p>
     </div>
 
     <div class="summary">
         <div class="summary-box">
-            <div class="s-label">Relevanță Fitness</div>
+            <div class="s-label">Relevanță Betoane</div>
             <div class="s-value" style="color:{_score_color(relevance_pct/100)}">{relevance_pct:.0f}%</div>
             <div class="s-sub">cazuri cu scor ≥ {threshold}</div>
         </div>
@@ -207,7 +207,7 @@ def save_report(results: list[dict], scores1: list[float], scores2: list[float],
 
     {cards}
 
-    <div class="footer">Instructor Fitness — Evaluation Report</div>
+    <div class="footer">Agent Vanzari Betoane — Evaluation Report</div>
 </div>
 <script>
     document.querySelectorAll(".markdown-body[data-markdown]").forEach(el => {{
